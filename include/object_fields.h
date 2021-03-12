@@ -1157,4 +1157,12 @@
 #define /*0x0FC*/ oYoshiChosenHome OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
 
+
+// Advanced lighting engine
+// These use previously unused object fields outside of the normal range
+// for specific behaviors, so they shouldn't interfere with any custom ones
+#define /*0x148*/ oLightColor                 OBJECT_FIELD_S32(0x30) // 0xRRGGBB00
+#define /*0x1A4*/ oLightQuadraticFalloff      OBJECT_FIELD_S16(0x47, 0)
+#define /*0x1A6*/ oLightLinearFalloff         OBJECT_FIELD_S16(0x47, 1)
+
 #endif // OBJECT_FIELDS_H

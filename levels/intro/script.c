@@ -19,6 +19,8 @@
 #include "levels/intro/header.h"
 
 const LevelScript level_intro_splash_screen[] = {
+    // Skip straight to main menu
+    JUMP(script_intro_L1),
     INIT_LEVEL(),
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
     LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),

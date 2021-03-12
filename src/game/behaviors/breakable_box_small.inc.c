@@ -20,6 +20,9 @@ void bhv_breakable_box_small_init(void) {
     obj_set_hitbox(o, &sBreakableBoxSmallHitbox);
     o->oAnimState = 1;
     o->activeFlags |= ACTIVE_FLAG_UNK9;
+    o->oLightColor = 0xBC954E00;
+    o->oLightQuadraticFalloff = 15;
+    o->oLightLinearFalloff = 255;
 }
 
 void small_breakable_box_spawn_dust(void) {
@@ -42,8 +45,8 @@ void small_breakable_box_act_move(void) {
     }
 
     if (sp1E & 2) {
-        spawn_mist_particles();
-        spawn_triangle_break_particles(20, 138, 0.7f, 3);
+        // spawn_mist_particles();
+        spawn_triangle_break_particles(7, 138, 0.7f, 3);
         obj_spawn_yellow_coins(o, 3);
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;

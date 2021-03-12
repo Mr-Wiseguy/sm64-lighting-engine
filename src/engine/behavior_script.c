@@ -902,6 +902,11 @@ static BhvCommandProc BehaviorCmdTable[] = {
     bhv_cmd_spawn_water_droplet,
 };
 
+#include <point_lights.h>
+#include <stdio.h>
+
+extern struct MarioState *gMarioState;
+
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
 void cur_obj_update(void) {
     UNUSED u32 unused;
@@ -998,6 +1003,27 @@ void cur_obj_update(void) {
                 gCurrentObject->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
                 gCurrentObject->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
             }
+        }
+    }
+
+    // Advanced lighting engine
+    // If this object emits light, is active, is visible, and there are still scene point light slots available,
+    // create a point light at this object
+    if ((objFlags & OBJ_FLAG_EMIT_LIGHT) && gPointLightCount < MAX_POINT_LIGHTS)
+    {
+        if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
+        {
+            emit_light(gCurrentObject->header.gfx.pos,
+                       gCurrentObject->oLightColor,
+                       gCurrentObject->oLightQuadraticFalloff,
+                       gCurrentObject->oLightLinearFalloff);
+        }
+        else if (gMarioState->heldObj == gCurrentObject)
+        {
+            emit_light(gMarioState->marioBodyState->heldObjLastPosition,
+                       gCurrentObject->oLightColor,
+                       gCurrentObject->oLightQuadraticFalloff,
+                       gCurrentObject->oLightLinearFalloff);
         }
     }
 }
