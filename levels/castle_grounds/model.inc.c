@@ -1,11 +1,3 @@
-Lights1 castle_grounds_dl_column_v3_lights = gdSPDefLights1(
-	0x7F, 0x7F, 0x7F,
-	0xFE, 0xFE, 0xFE, 0x28, 0x28, 0x28);
-
-Lights1 castle_grounds_dl_checkerboard_v3_lights = gdSPDefLights1(
-	0x7F, 0x7F, 0x7F,
-	0xFE, 0xFE, 0xFE, 0x28, 0x28, 0x28);
-
 Gfx castle_grounds_dl_stripes_i4_aligner[] = {gsSPEndDisplayList()};
 u8 castle_grounds_dl_stripes_i4[] = {
 	0xff, 0xff, 0xff, 0xff, 0x66, 0x66, 0x66, 0x66, 
@@ -460,6 +452,19 @@ Gfx castle_grounds_dl_Plane_mesh_tri_0[] = {
 	gsSPEndDisplayList(),
 };
 
+Vtx castle_grounds_dl_Plane_mesh_vtx_1[4] = {
+	{{{-100, 349, 632},0, {1024, 0},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{100, 349, 632},0, {0, 0},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{100, 149, 632},0, {0, 1024},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{-100, 149, 632},0, {1024, 1024},{0xFF, 0xFF, 0xFF, 0xFF}}},
+};
+
+Gfx castle_grounds_dl_Plane_mesh_tri_1[] = {
+	gsSPVertex(castle_grounds_dl_Plane_mesh_vtx_1 + 0, 4, 0),
+	gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
+	gsSPEndDisplayList(),
+};
+
 Gfx mat_castle_grounds_dl_column_v3[] = {
 	gsDPPipeSync(),
 	gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, TEXEL0, 0, SHADE, 0, 0, 0, 0, 1),
@@ -473,7 +478,6 @@ Gfx mat_castle_grounds_dl_column_v3[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_I, G_IM_SIZ_4b, 1, 0, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 2, 0, G_TX_WRAP | G_TX_NOMIRROR, 2, 0),
 	gsDPSetTileSize(0, 0, 0, 12, 12),
-	gsSPSetLights1(castle_grounds_dl_column_v3_lights),
 	gsSPEndDisplayList(),
 };
 
@@ -510,7 +514,6 @@ Gfx mat_castle_grounds_dl_checkerboard_v3[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_4b, 2, 0, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, 0),
 	gsDPSetTileSize(0, 0, 0, 124, 124),
-	gsSPSetLights1(castle_grounds_dl_checkerboard_v3_lights),
 	gsSPEndDisplayList(),
 };
 

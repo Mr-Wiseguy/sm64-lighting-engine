@@ -3,9 +3,15 @@
 const GeoLayout castle_grounds_area_1_geo[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
+		GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 129, 129, 129, -83, -66, 68),
+		GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 27, 27, 27, 0, 0, 0),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, -597, 300, -422, castle_grounds_dl_Column_mesh),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, -455, 266, 430, castle_grounds_dl_Icosphere_mesh),
 		GEO_DISPLAY_LIST(LAYER_OPAQUE, castle_grounds_dl_Plane_mesh),
+		GEO_TRANSLATE_NODE(0, 800, 198, 802),
+		GEO_OPEN_NODE(),
+			GEO_SCENE_LIGHT(LIGHT_TYPE_POINT, 255, 40, 0, 1, 0, 8),
+		GEO_CLOSE_NODE(),
 	GEO_CLOSE_NODE(),
 	GEO_RETURN(),
 };
