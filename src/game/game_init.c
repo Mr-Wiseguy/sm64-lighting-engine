@@ -111,7 +111,7 @@ void my_rsp_init(void) {
     // For Fast3DEX2, this causes the dreaded warped vertices issue
     // unless the clipping ratio is changed back to the intended value,
     // as Fast3DEX2 uses a different initial value than Fast3D(EX).
-#if defined(F3DEX_GBI_2) || defined(F3DZEX_GBI)
+#ifdef F3DEX_GBI_2
     gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
 #endif
 }

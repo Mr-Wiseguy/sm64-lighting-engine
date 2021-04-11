@@ -127,7 +127,7 @@ struct GraphNodeObject *gCurGraphNodeObject = NULL;
 struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
-#if defined(F3DEX_GBI_2) || defined(F3DZEX_GBI)
+#ifdef F3DEX_GBI_2
 LookAt lookAt;
 #endif
 
@@ -144,7 +144,7 @@ static void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     // @bug This is where the LookAt values should be calculated but aren't.
     // As a result, environment mapping is broken on Fast3DEX2 without the
     // changes below.
-#if defined(F3DEX_GBI_2) || defined(F3DZEX_GBI)
+#ifdef F3DEX_GBI_2
     Mtx lMtx;
     guLookAtReflect(&lMtx, &lookAt, 0, 0, 0, /* eye */ 0, 0, 1, /* at */ 1, 0, 0 /* up */);
 #endif
@@ -178,7 +178,7 @@ static void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  */
 static void geo_append_display_list(void *displayList, s16 layer) {
 
-#if defined(F3DEX_GBI_2) || defined(F3DZEX_GBI)
+#ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
     if (gCurGraphNodeMasterList != 0) {
@@ -1193,7 +1193,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
     Vec3f translation;
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
-#if defined(F3DEX_GBI_2) || defined(F3DZEX_GBI)
+#ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
 
