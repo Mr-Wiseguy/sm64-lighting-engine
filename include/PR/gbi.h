@@ -1411,7 +1411,7 @@ typedef struct {
 
 typedef struct {
   unsigned char	col[3];		/* diffuse light value (rgba) */
-  char 		is_point;
+  char 		constant_attenuation;
   unsigned char	colc[3];	/* copy of diffuse light value (rgba) */
   char 		linear_attenuation;
   signed short	pos[3];		/* direction of light (normalized) */

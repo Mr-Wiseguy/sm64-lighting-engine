@@ -34,6 +34,6 @@ extern struct SceneLight gPointLights[];
 extern u8 gAreaPointLightCount;
 extern u8 gPointLightCount;
 
-void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff);
+void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff);
 
 #endif

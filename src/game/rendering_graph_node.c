@@ -485,7 +485,7 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
 
             lightDist = sqrtf(distancesSq[i]);
             lightScale = 1.0f / ((1.0f / 65536.0f) * (
-                0.25f * lights[i]->l.pl.is_point +
+                0.25f * lights[i]->l.pl.constant_attenuation +
                 2.0f * lightDist * lights[i]->l.pl.linear_attenuation +
                 0.3f * lightDist * lightDist * lights[i]->l.pl.quadratic_attenuation) + 1.0f);
 
@@ -524,12 +524,12 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
     return pointLightsDlHead;
 }
 
-void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff)
+void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff)
 {
     gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = (color >> 24) & 0xFF;
     gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = (color >> 16) & 0xFF;
     gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = (color >> 8)  & 0xFF;
-    gPointLights[gPointLightCount].l.pl.is_point = 0x08;
+    gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 1 : constantFalloff;
     gPointLights[gPointLightCount].l.pl.linear_attenuation = linearFalloff;
     gPointLights[gPointLightCount].l.pl.quadratic_attenuation = quadraticFalloff;
     gPointLights[gPointLightCount].worldPos[0] = pos[0];
@@ -566,7 +566,7 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     // gSPLight(gDisplayListHead++, &gPointLights[0].l, LIGHT_2);
     // gSPLight(gDisplayListHead++, &gDirectionalLight.a, LIGHT_2);
 
-    // gPointLights[0].l.pl.is_point = 0x08;
+    // gPointLights[0].l.pl.constant_attenuation = 0x08;
     // gPointLights[0].l.pl.pos[0] = 100;
     // gPointLights[0].l.pl.pos[1] = 100;
     // gPointLights[0].l.pl.pos[2] = -500;
@@ -1293,7 +1293,7 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
 
             node->light->l.pl.quadratic_attenuation = node->a;
             node->light->l.pl.linear_attenuation = node->b;
-            node->light->l.pl.is_point = node->c;
+            node->light->l.pl.constant_attenuation = (node->c == 0) ? 1 : node->c;
             break;
         case LIGHT_TYPE_AMBIENT:
             // Set the ambient light color
