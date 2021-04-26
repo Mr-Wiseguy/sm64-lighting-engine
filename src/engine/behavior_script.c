@@ -839,6 +839,34 @@ static s32 bhv_cmd_animate_texture(void) {
     return BHV_PROC_CONTINUE;
 }
 
+// Advanced lighting engine
+// Command 0x38: Sets an object's light color
+// Usage: SET_LIGHT_COLOR(red, green, blue)
+static s32 bhv_cmd_set_light_color(void) {
+    u32 color = BHV_CMD_GET_U32(0) << 8;
+
+    gCurrentObject->oLightColor = color;
+
+    gCurBhvCommand++;
+    return BHV_PROC_CONTINUE;
+}
+
+// Advanced lighting engine
+// Command 0x39: Sets an object's light falloff
+// Usage: SET_LIGHT_FALLOFF(constant, linear, quadratic)
+static s32 bhv_cmd_set_light_falloff(void) {
+    s32 constantFalloff = BHV_CMD_GET_2ND_S16(0);
+    s32 linearFalloff = BHV_CMD_GET_1ST_S16(1);
+    s32 quadraticFalloff = BHV_CMD_GET_2ND_S16(1);
+
+    gCurrentObject->oLightQuadraticFalloff = quadraticFalloff;
+    gCurrentObject->oLightLinearFalloff = linearFalloff;
+    gCurrentObject->oLightConstantFalloff = constantFalloff;
+
+    gCurBhvCommand += 2;
+    return BHV_PROC_CONTINUE;
+}
+
 void stub_behavior_script_2(void) {
 }
 
@@ -900,6 +928,8 @@ static BhvCommandProc BehaviorCmdTable[] = {
     bhv_cmd_disable_rendering,
     bhv_cmd_set_int_unused,
     bhv_cmd_spawn_water_droplet,
+    bhv_cmd_set_light_color,
+    bhv_cmd_set_light_falloff,
 };
 
 #include <point_lights.h>
@@ -1011,10 +1041,13 @@ void cur_obj_update(void) {
     // create a point light at this object
     if ((objFlags & OBJ_FLAG_EMIT_LIGHT) && gPointLightCount < MAX_POINT_LIGHTS)
     {
+        s32 red   = (gCurrentObject->oLightColor >> 24) & 0xFF;
+        s32 green = (gCurrentObject->oLightColor >> 16) & 0xFF;
+        s32 blue  = (gCurrentObject->oLightColor >>  8) & 0xFF;
         if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
         {
             emit_light(gCurrentObject->header.gfx.pos,
-                       gCurrentObject->oLightColor,
+                       red, green, blue,
                        gCurrentObject->oLightQuadraticFalloff,
                        gCurrentObject->oLightLinearFalloff,
                        gCurrentObject->oLightConstantFalloff);
@@ -1022,7 +1055,7 @@ void cur_obj_update(void) {
         else if (gMarioState->heldObj == gCurrentObject)
         {
             emit_light(gMarioState->marioBodyState->heldObjLastPosition,
-                       gCurrentObject->oLightColor,
+                       red, green, blue,
                        gCurrentObject->oLightQuadraticFalloff,
                        gCurrentObject->oLightLinearFalloff,
                        gCurrentObject->oLightConstantFalloff);

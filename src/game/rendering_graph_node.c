@@ -311,6 +311,8 @@ extern struct MarioState *gMarioState;
 struct SceneLight gPointLights[MAX_POINT_LIGHTS];
 s8 gLightDir[3] = {0x28, 0x28, 0x28};
 u8 gLightDirTransformEnabled = 0;
+u8 gOverrideDirectionalLight = FALSE;
+u8 gOverrideAmbientLight = FALSE;
 u8 gPointLightCount = 0;
 u8 gAreaPointLightCount = 0;
 
@@ -524,11 +526,37 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
     return pointLightsDlHead;
 }
 
-void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff)
+// Sets the scene's directional light, overrides whatever may be set in the area's geolayout
+void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue)
 {
-    gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = (color >> 24) & 0xFF;
-    gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = (color >> 16) & 0xFF;
-    gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = (color >> 8)  & 0xFF;
+    Vec3f directionNormalized;
+    vec3f_copy(directionNormalized, direction);
+    vec3f_normalize(directionNormalized);
+    gLightDir[0] = (s8)(s32)(directionNormalized[0] * 0x40);
+    gLightDir[1] = (s8)(s32)(directionNormalized[1] * 0x40);
+    gLightDir[2] = (s8)(s32)(directionNormalized[2] * 0x40);
+    gDirectionalLight.l[0].l.colc[0] = gDirectionalLight.l[0].l.col[0] = red;
+    gDirectionalLight.l[0].l.colc[1] = gDirectionalLight.l[0].l.col[1] = green;
+    gDirectionalLight.l[0].l.colc[2] = gDirectionalLight.l[0].l.col[2] = blue;
+    gLightDirTransformEnabled = TRUE;
+    gOverrideDirectionalLight = TRUE;
+}
+
+// Sets the scene's ambient light, overrides whatever may be set in the area's geolayout
+void set_ambient_light(s32 red, s32 green, s32 blue)
+{
+    gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = red;
+    gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = green;
+    gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = blue;
+    gOverrideAmbientLight = TRUE;
+}
+
+// Emits a point light with the given parameters
+void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff)
+{
+    gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = red;
+    gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = green;
+    gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = blue;
     gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 1 : constantFalloff;
     gPointLights[gPointLightCount].l.pl.linear_attenuation = linearFalloff;
     gPointLights[gPointLightCount].l.pl.quadratic_attenuation = quadraticFalloff;
@@ -561,18 +589,6 @@ void geo_process_camera(struct GraphNodeCamera *node) {
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
     geo_append_display_list(setLightsDL, LAYER_OPAQUE);
-    // gSPNumLights(gDisplayListHead++, NUMLIGHTS_2);
-    // gSPLight(gDisplayListHead++, gDirectionalLight.l, LIGHT_1);
-    // gSPLight(gDisplayListHead++, &gPointLights[0].l, LIGHT_2);
-    // gSPLight(gDisplayListHead++, &gDirectionalLight.a, LIGHT_2);
-
-    // gPointLights[0].l.pl.constant_attenuation = 0x08;
-    // gPointLights[0].l.pl.pos[0] = 100;
-    // gPointLights[0].l.pl.pos[1] = 100;
-    // gPointLights[0].l.pl.pos[2] = -500;
-    // gPointLights[0].l.pl.colc[0] = gPointLights[0].l.pl.col[0] = 0xFF;
-    // gPointLights[0].l.pl.colc[1] = gPointLights[0].l.pl.col[1] = 0xFF;
-    // gPointLights[0].l.pl.colc[2] = gPointLights[0].l.pl.col[2] = 0xFF;
 
     mtxf_lookat(cameraTransform, node->pos, node->focus, node->roll);
     mtxf_mul(gMatStack[gMatStackIndex + 1], cameraTransform, gMatStack[gMatStackIndex]);
@@ -614,6 +630,8 @@ void geo_process_camera(struct GraphNodeCamera *node) {
         gDirectionalLight.l->l.dir[1] = gLightDir[1];
         gDirectionalLight.l->l.dir[2] = gLightDir[2];
     }
+    gOverrideAmbientLight = FALSE;
+    gOverrideDirectionalLight = FALSE;
     
     // Set up the light display list
     // This has to be done after the area's GeoLayout is processed, as
@@ -1264,15 +1282,18 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
     switch (node->lightType)
     {
         case LIGHT_TYPE_DIRECTIONAL:
-            // Set the directional light color
-            gDirectionalLight.l->l.colc[0] = gDirectionalLight.l->l.col[0] = node->color[0];
-            gDirectionalLight.l->l.colc[1] = gDirectionalLight.l->l.col[1] = node->color[1];
-            gDirectionalLight.l->l.colc[2] = gDirectionalLight.l->l.col[2] = node->color[2];
+            if (!gOverrideDirectionalLight)
+            {
+                // Set the directional light color
+                gDirectionalLight.l->l.colc[0] = gDirectionalLight.l->l.col[0] = node->color[0];
+                gDirectionalLight.l->l.colc[1] = gDirectionalLight.l->l.col[1] = node->color[1];
+                gDirectionalLight.l->l.colc[2] = gDirectionalLight.l->l.col[2] = node->color[2];
 
-            // Set the pre transformed light direction
-            gLightDir[0] = node->a;
-            gLightDir[1] = node->b;
-            gLightDir[2] = node->c;
+                // Set the pre transformed light direction
+                gLightDir[0] = node->a;
+                gLightDir[1] = node->b;
+                gLightDir[2] = node->c;
+            }
             break;
         case LIGHT_TYPE_POINT:
         case LIGHT_TYPE_POINT_OCCLUDE:
@@ -1296,10 +1317,13 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
             node->light->l.pl.constant_attenuation = (node->c == 0) ? 1 : node->c;
             break;
         case LIGHT_TYPE_AMBIENT:
-            // Set the ambient light color
-            gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = node->color[0];
-            gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = node->color[1];
-            gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = node->color[2];
+            if (!gOverrideAmbientLight)
+            {
+                // Set the ambient light color
+                gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = node->color[0];
+                gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = node->color[1];
+                gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = node->color[2];
+            }
             break;
     }
 

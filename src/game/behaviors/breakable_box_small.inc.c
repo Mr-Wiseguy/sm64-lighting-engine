@@ -20,9 +20,6 @@ void bhv_breakable_box_small_init(void) {
     obj_set_hitbox(o, &sBreakableBoxSmallHitbox);
     o->oAnimState = 1;
     o->activeFlags |= ACTIVE_FLAG_UNK9;
-    o->oLightColor = 0xBC954E00;
-    o->oLightQuadraticFalloff = 15;
-    o->oLightLinearFalloff = 255;
 }
 
 void small_breakable_box_spawn_dust(void) {

@@ -34,6 +34,13 @@ extern struct SceneLight gPointLights[];
 extern u8 gAreaPointLightCount;
 extern u8 gPointLightCount;
 
-void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff);
+// Sets the scene's directional light, overrides whatever may be set in the area's geolayout
+void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue);
+
+// Sets the scene's ambient light, overrides whatever may be set in the area's geolayout
+void set_ambient_light(s32 red, s32 green, s32 blue);
+
+// Emits a point light with the given parameters
+void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff);
 
 #endif

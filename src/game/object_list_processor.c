@@ -274,36 +274,10 @@ Vec3f intersect;
 void bhv_mario_update(void) {
     u32 particleFlags = 0;
     s32 i;
-    Vec3f dir;
-    Vec3f rayStart;
-    struct SurfaceNode *node;
-    f32 intDist;
 
     particleFlags = execute_mario_action(gCurrentObject);
 
     gCurrentObject->oMarioParticleFlags = particleFlags;
-
-    rayStart[0] = gMarioState->pos[0];
-    rayStart[1] = gMarioState->pos[1] + 80;
-    rayStart[2] = gMarioState->pos[2];
-
-    dir[0] = sins(gMarioState->faceAngle[1]);
-    dir[1] = 0;
-    dir[2] = coss(gMarioState->faceAngle[1]);
-
-    // intDist = raycast(rayStart, dir, 1000.0f, intersect, &node);
-
-    // if (intDist >= 0.0f)
-    // {
-        // char text[20];
-        // struct Object* particle;
-        // sprintf(text, "hit: %4.0f %4.0f %4.0f %4.0f", intDist, intersect[0], intersect[1], intersect[2]);
-        // print_text(20, 20, text);
-        // particle = spawn_object(gMarioObject, MODEL_SPARKLES, bhvCoinSparkles);
-        // particle->oPosX = intersect[0] - dir[0] * 10;
-        // particle->oPosY = intersect[1] - dir[1] * 10;
-        // particle->oPosZ = intersect[2] - dir[2] * 10;
-    // }
 
     // Mario code updates MarioState's versions of position etc, so we need
     // to sync it with the Mario object
