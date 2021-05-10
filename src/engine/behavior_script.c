@@ -1048,17 +1048,17 @@ void cur_obj_update(void) {
         {
             emit_light(gCurrentObject->header.gfx.pos,
                        red, green, blue,
-                       gCurrentObject->oLightQuadraticFalloff,
+                       gCurrentObject->oLightConstantFalloff,
                        gCurrentObject->oLightLinearFalloff,
-                       gCurrentObject->oLightConstantFalloff);
+                       gCurrentObject->oLightQuadraticFalloff);
         }
         else if (gMarioState->heldObj == gCurrentObject)
         {
             emit_light(gMarioState->marioBodyState->heldObjLastPosition,
                        red, green, blue,
-                       gCurrentObject->oLightQuadraticFalloff,
+                       gCurrentObject->oLightConstantFalloff,
                        gCurrentObject->oLightLinearFalloff,
-                       gCurrentObject->oLightConstantFalloff);
+                       gCurrentObject->oLightQuadraticFalloff);
         }
     }
 }

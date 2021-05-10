@@ -41,6 +41,6 @@ void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue);
 void set_ambient_light(s32 red, s32 green, s32 blue);
 
 // Emits a point light with the given parameters
-void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff);
+void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 constantFalloff, u32 linearFalloff, u32 quadraticFalloff);
 
 #endif

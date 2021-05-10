@@ -552,7 +552,7 @@ void set_ambient_light(s32 red, s32 green, s32 blue)
 }
 
 // Emits a point light with the given parameters
-void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff)
+void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 constantFalloff, u32 linearFalloff, u32 quadraticFalloff)
 {
     gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = red;
     gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = green;
