@@ -555,6 +555,21 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
 }
 
 /**
+ * Multiply a vector with a transformation matrix, which applies the transformation
+ * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
+ * true for transformation matrices if the translation has a w component of 1.
+ */
+void mtxf_mul_vec3f(Mat4 mtx, Vec3f in, Vec3f out) {
+    register f32 x = in[0];
+    register f32 y = in[1];
+    register f32 z = in[2];
+
+    out[0] = x * mtx[0][0] + y * mtx[1][0] + z * mtx[2][0] + mtx[3][0];
+    out[1] = x * mtx[0][1] + y * mtx[1][1] + z * mtx[2][1] + mtx[3][1];
+    out[2] = x * mtx[0][2] + y * mtx[1][2] + z * mtx[2][2] + mtx[3][2];
+}
+
+/**
  * Convert float matrix 'src' to fixed point matrix 'dest'.
  * The float matrix may not contain entries larger than 65536 or the console
  * crashes. The fixed point matrix has entries with a 16-bit integer part, so

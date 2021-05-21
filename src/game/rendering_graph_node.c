@@ -322,15 +322,13 @@ Lights1 gDirectionalLight = gdSPDefLights1(
 
 /**
  * Gets the square of the distance between two vectors
- * The first vector is of floats, the second is of s16
- * All math operations are done on integers
  */
-u32 vec3f_vec3s_dist_sq(Vec3f p1, Vec3s p2)
+f32 vec3f_dist_sq(Vec3f p1, Vec3f p2)
 {
-    s32 dx = p2[0] - (s32)p1[0];
-    s32 dy = p2[1] - (s32)p1[1];
-    s32 dz = p2[2] - (s32)p1[2];
-    return (u32)(dx * dx) + (u32)(dy * dy) + (u32)(dz * dz);
+    f32 dx = p2[0] - p1[0];
+    f32 dy = p2[1] - p1[1];
+    f32 dz = p2[2] - p1[2];
+    return (dx * dx) + (dy * dy) + (dz * dz);
 }
 
 #define MAX_POINT_LIGHT_DIST (3000)
@@ -354,17 +352,17 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
     s32 numLightsPicked = 0;
 
     // The square of the distances to each point light
-    u32 distancesSq[MAX_POINT_LIGHTS_ACTIVE];
+    f32 distancesSq[MAX_POINT_LIGHTS_ACTIVE];
 
     // The distance of the furthest light selected
-    u32 maxDistanceSq;
+    f32 maxDistanceSq;
 
     // The index of the furthest away light from this object
     // i.e. if index 1 in lights is the furthest light from this object, then this is 1
     u32 maxIndex = 0;
 
     // The square of the distance to the current light being checked
-    u32 curDistSq;
+    f32 curDistSq;
 
     // The index of a point light being added (its position in Light *lights[])
     s32 newIndex;
@@ -389,14 +387,14 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
         newIndex = -1;
 
         // Get the distance to the current light from the object
-        curDistSq = vec3f_vec3s_dist_sq(pos, gPointLights[i].worldPos);
+        curDistSq = vec3f_dist_sq(pos, gPointLights[i].worldPos);
 
         // Skip this point light if it is too far away to matter
         if (curDistSq > MAX_POINT_LIGHT_DIST * MAX_POINT_LIGHT_DIST) continue;
 
         // Skip this point light if it is set to occlude and is occluded
         // If the object and the light are at the same position, skip the raycast
-        if (curDistSq != 0 && gPointLights[i].flags & LIGHT_FLAG_OCCLUDE)
+        if (curDistSq > 0.01 && gPointLights[i].flags & LIGHT_FLAG_OCCLUDE)
         {
             dir[0] = gPointLights[i].worldPos[0] - pos[0];
             dir[1] = gPointLights[i].worldPos[1] - pos[1];
@@ -613,8 +611,9 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     // Transform the point light positions into screen space
     for (i = 0; i < gPointLightCount; i++)
     {
-        vec3s_copy(gPointLights[i].l.pl.pos, gPointLights[i].worldPos);
-        mtxf_mul_vec3s(gMatStack[gMatStackIndex], gPointLights[i].l.pl.pos);
+        Vec3f transformed;
+        mtxf_mul_vec3f(gMatStack[gMatStackIndex], gPointLights[i].worldPos, transformed);
+        vec3f_to_vec3s(gPointLights[i].l.pl.pos, transformed);
     }
 
     // Transform the directional light if enabled

@@ -22,7 +22,7 @@ STATIC_ASSERT(MAX_POINT_LIGHTS_ACTIVE <= 6, "You cannot apply more than 6 point 
 
 struct SceneLight {
     Light l;
-    Vec3s worldPos;
+    Vec3f worldPos;
     s16 flags;
 };
 
